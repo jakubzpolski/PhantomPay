@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    environment:
+      - FERNET_KEY=${FERNET_KEY}
+      - REDIS_HOST=redis
+      - REDIS_PASS=${REDIS_PASS}
+    volumes:
+      - tor_data:/var/lib/tor
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    networks:
+      - phantom-net
+
+  frontend:
+    build: ./frontend
+    environment:
+      - VITE_API_URL=http://backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - phantom-net
+
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass ${REDIS_PASS}
+    volumes:
+      - redis_data:/data
+    networks:
+      - phantom-net
+
+  tor:
+    image: osminogin/tor-simple
+    volumes:
+      - ./backend/torrc:/etc/tor/torrc:ro
+      - tor_data:/var/lib/tor
+    ports:
+      - "9050:9050"
+      - "80:80"
+    networks:
+      - phantom-net
+
+volumes:
+  redis_data:
+  tor_data:
+
+networks:
+  phantom-net:
+    driver: bridge
