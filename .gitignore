@@ -1,0 +1,24 @@
+# Environment
+.env
+.env*.local
+
+# Sensitive data
+*.key
+*.pem
+*.cert
+*.onion
+
+# Runtime files
+__pycache__/
+node_modules/
+dist/
+build/
+*.log
+*.pid
+*.seed
+
+# Database
+*.db
+*.sqlite
+redis_data/
+tor_data/
